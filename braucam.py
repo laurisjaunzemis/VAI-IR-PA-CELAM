@@ -97,7 +97,7 @@ class CarpoolApp:
     def show_rides(self):
         self.clear_window()
         try:
-            response = requests.get(f"{API_BASE_URL}/braucieni")
+            response = requests.get(f"{API_BASE_URL}/Braucieni")
             rides = response.json()
         except Exception as e:
             messagebox.showerror("Kļūda", str(e))
@@ -128,8 +128,28 @@ class CarpoolApp:
             messagebox.showwarning("Brīdinājums", "Lūdzu, atlasiet braucienu!")
             return
 
-        ride_id = tree.item(selected_item)['values'][0]
-        messagebox.showinfo("Rezervācija", f"Brauciens ID {ride_id} rezervēts!")
+        values = tree.item(selected_item)['values']
+        ride_id = values[0]
+        remaining_seats = int(values[7])
+
+        if remaining_seats <= 0:
+            messagebox.showerror("Kļūda", "Šajā braucienā vairs nav brīvu vietu!")
+            return
+
+        new_seat_count = remaining_seats - 1
+
+        try:
+            response = requests.put(
+                f"{API_BASE_URL}/Braucieni/{ride_id}",
+                json={"vietas": new_seat_count}
+            )
+            if response.status_code == 200:
+                messagebox.showinfo("Rezervācija", f"Brauciens ID {ride_id} rezervēts!\nAtlikušas vietas: {new_seat_count}")
+            else:
+                messagebox.showerror("Kļūda", f"Rezervācija neizdevās! Statuss: {response.status_code}")
+        except Exception as e:
+            messagebox.showerror("Kļūda", f"Radās kļūda: {str(e)}")
+
         self.show_main_menu()
 
     def login(self):
@@ -154,12 +174,10 @@ class CarpoolApp:
         phone = self.entries['phone'].get()
         is_driver = bool(self.user_type.get())
 
-        # Pārbauda, vai visi lauki ir aizpildīti
         if not username or not password or not name or not phone:
             messagebox.showerror("Kļūda", "Visi lauki jāaizpilda!")
             return
 
-        # Sagatavo lietotāja datus
         user_data = {
             "lietotajvards": username,
             "parole": password,
@@ -168,21 +186,12 @@ class CarpoolApp:
             "ir_vaditajs": is_driver
         }
 
-        # Pārbauda, ko tieši mēs sūtām
-        print("Sūta uz serveri:", user_data)
-
         try:
             response = requests.post(f"{API_BASE_URL}/lietotaja", json=user_data)
-
-            # Izdrukā servera atbildi
-            print("Servera atbilde:", response.status_code, response.text)
-
-            # Pārbauda atbildes statusu
             if response.status_code == 201:
                 messagebox.showinfo("Veiksmīgi", "Reģistrācija veiksmīga! Lūdzu pieslēdzieties.")
                 self.show_login_screen()
             else:
-                # Parāda detalizētu kļūdas informāciju
                 messagebox.showerror("Kļūda", f"Reģistrācija neizdevās! Statuss: {response.status_code}, Atbilde: {response.text}")
         except Exception as e:
             messagebox.showerror("Kļūda", f"Radās kļūda: {str(e)}")
@@ -206,7 +215,7 @@ class CarpoolApp:
         }
 
         try:
-            response = requests.post(f"{API_BASE_URL}/braucieni", json=ride_data)
+            response = requests.post(f"{API_BASE_URL}/Braucieni", json=ride_data)
             if response.status_code == 201:
                 messagebox.showinfo("Veiksmīgi", "Brauciens pievienots!")
                 self.show_main_menu()
