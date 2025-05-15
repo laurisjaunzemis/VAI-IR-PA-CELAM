@@ -5,8 +5,8 @@ Gala programmma ir braucam.py
 Aplikāciju veidoja Rainers Vitkus, Lauris Jaunzemis, Artis Salna.
 Pēdējā versija tika pabeigta 15,05,2025
 
-Programmētājs iebrauc veikalā un saka:
-"Man vajag pienu. Ja būs olas, tad paņem 10."
-Viņa sieva pārnāk mājās ar 10 pieniem.
-Programmētājs: "Kāpēc tik daudz piena??"
-Sieva: "Bija olas."
+Klients: “Vai tu vari uzlabot šo funkciju?”
+Programmētājs: “Protams!”
+(Pēc 2 stundām)
+Klients: “Kāpēc tā vairs nestrādā?”
+Programmētājs: “Tu teici – uzlabot. Nevis – lai strādā.”
